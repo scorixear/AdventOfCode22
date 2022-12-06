@@ -2,7 +2,7 @@
 import os
 import sys
 
-INPUT_FILE="inputtest"
+INPUT_FILE="sample"
 
 def main():
   """Main Function called on Startup"""
