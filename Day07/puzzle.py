@@ -5,7 +5,7 @@ import time
 import functools
 from typing import Optional
 
-INPUT_FILE="sample"
+INPUT_FILE="input"
 
 class Node:
   def __init__(self, name: str, parent: Optional["Node"]):
@@ -20,6 +20,12 @@ class Node:
       if node.name == name and node.is_directory():
         return node
     return None
+  def __repr__(self) -> str:
+   return f"{self.name} ({'dir' if self.size==0 else 'file, '+str(self.size)})"
+  def print(self, indent = "") -> None:
+    print(indent+self.__repr__())
+    for node in self.nodes:
+      node.print(indent + "   ")
 
   @functools.cache
   def get_size(self) -> int:
@@ -50,14 +56,15 @@ def solve1(root: "Node"):
   print(f"Total Sum: {sum}\nTotal Folders: {len(dirs)}")
 
 def solve2(root: "Node"):
-  total_space = root.get_size()
-  missing_space = total_space - 30_000_000
+  used_space = root.get_size()
+  free_space = 70_000_000 - used_space
+  missing_space = 30_000_000 - free_space
   folders = root.get_directories()
-  smallest = total_space
+  smallest = used_space
   for folder in folders:
     if folder.get_size() < smallest and folder.get_size() >= missing_space:
       smallest = folder.get_size()
-  print(f"Total Space: {total_space}\nMising Space: {missing_space}\nSmallest Directory: {smallest}")
+  print(f"Used Space: {used_space}\nFree Space: {free_space}\nMising Space: {missing_space}\nSmallest Directory: {smallest}")
 
 def main():
   """Main Function called on Startup"""
@@ -88,7 +95,7 @@ def main():
         fileNode = Node(name, currentNode)
         fileNode.size = size
         currentNode.nodes.append(fileNode)
-  
+  #root.print()
   solve2(root)
  
 
@@ -101,4 +108,4 @@ if __name__ == "__main__":
   main()
   et = time.time()
   evaluationtime = (et-st)*1000
-  print(f"Execution time: {evaluationtime}ms");
+  print(f"Execution time: {evaluationtime}ms")
