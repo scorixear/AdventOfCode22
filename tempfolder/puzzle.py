@@ -1,6 +1,7 @@
 """provides path joining functions annd module joining"""
 import os
 import sys
+import time
 
 INPUT_FILE="sample"
 
@@ -10,4 +11,8 @@ def main():
   lines = input_text.readlines()
 
 if __name__ == "__main__":
+  st = time.time()
   main()
+  et = time.time()
+  evaluationtime = (et-st)*1000
+  print(f"Execution time: {evaluationtime}ms");
