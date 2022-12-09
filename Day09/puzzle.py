@@ -8,6 +8,11 @@ INPUT_FILE="input"
 def no_move(head, tail):
   return abs(head[0]- tail[0]) <=1 and abs(head[1]-tail[1]) <= 1
 
+def calc_smart(head, tail):
+  if no_move(head, tail):
+    return tail
+  return (tail[0]+ max(min(1, head[0]-tail[0]),-1), tail[1]+max(min(1,head[1]-tail[1]),-1))
+
 def calc_next(head, tail) -> tuple[int, int]:
   if no_move(head, tail):
     return tail
@@ -44,8 +49,7 @@ def move(direction, head, rope: list[tuple[int, int]]) -> tuple[tuple[int, int],
       head = (head[0], head[1]-1)
   current_node = head
   for index, node in enumerate(rope):
-    
-    next = calc_next(current_node, node)
+    next = calc_smart(current_node, node)
     if node == next:
       break
     rope[index]= next
