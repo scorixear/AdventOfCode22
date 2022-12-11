@@ -36,15 +36,11 @@ class monkey:
     returnList = []
     for item in self.items:
       self.inspections += 1
-      print(f"\nBefore Item  {item}")
       item = self.operation(item)
       item = item // 3
-      print(f"After Item {item}")
       if item % self.test == 0:
-        print(f"Sent to {self.outcomeTrue}")
         returnList.append([self.outcomeTrue, item])
       else:
-        print(f"Sent to {self.outcomeFalse}")
         returnList.append([self.outcomeFalse, item])
     return returnList
   def __repr__(self) -> str:
@@ -99,9 +95,7 @@ def main():
   # starting rounds
   # for i in range(20)
   for i in range(4):
-    print(f"\nRound {i}\n")
     for current in monkeys:
-      print(f"Monkey {current.index}")
       items = current.inspectItems()
       newMonkeyItems: list[int] = []
       for item in items:
