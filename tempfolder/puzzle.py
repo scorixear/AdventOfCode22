@@ -15,4 +15,4 @@ if __name__ == "__main__":
   main()
   et = time.time()
   evaluationtime = (et-st)*1000
-  print(f"Execution time: {evaluationtime}ms");
+  print(f"Execution time: {evaluationtime}ms")
