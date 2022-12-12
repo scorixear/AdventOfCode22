@@ -13,35 +13,21 @@ class node:
     self.elevation = elevation
     self.connections = []
   def add_neighbour(self, other: "node"):
-    if other.elevation - self.elevation <= 1:
+    if other.elevation - self.elevation >= -1:
       self.connections.append(other)
   def find_connections(self, grid: list[list["node"]]):
-    # upper edge
+    # up
     if self.y > 0:
-      # x00
-      #if self.x > 0:
-      #  self.add_neighbour(grid[self.y-1][self.x-1])
-      # 0x0
       self.add_neighbour(grid[self.y-1][self.x])
-      # 00x
-      #if self.x < len(grid[self.y-1])-1:
-      #  self.add_neighbour(grid[self.y-1][self.x+1])
-    # x.0
+    # left
     if self.x > 0:
       self.add_neighbour(grid[self.y][self.x-1])
-    # 0.x
+    # right
     if self.x < len(grid[self.y])-1:
       self.add_neighbour(grid[self.y][self.x+1])
-    # lower edge
+    # down
     if self.y < len(grid)-1:
-      # x00
-      #if self.x > 0:
-      #  self.add_neighbour(grid[self.y+1][self.x-1])
-      # 0x0
       self.add_neighbour(grid[self.y+1][self.x])
-      # 00x
-      #if self.x < len(grid[self.y+1])-1:
-      #  self.add_neighbour(grid[self.y+1][self.x+1])
       
 def main():
   """Main Function called on Startup"""
@@ -49,29 +35,35 @@ def main():
   lines = input_text.readlines()
   grid: list[list[node]] = [[] for _ in range(len(lines))]
   startNode = None
-  endNode = None
+  endNodes = []
   for y,line in enumerate(lines):
     #print(line.strip())
     for x,char in enumerate(line.strip()):
       newNode = node(x,y,0)
-      if char == "S":
+      if char == "S" or char == "a":
         newNode.elevation = 1
-        startNode = newNode
+        endNodes.append(newNode)
       elif char == "E":
         newNode.elevation = 26
-        endNode = newNode
+        startNode = newNode
       else:
         newNode.elevation = ord(char)-96
       grid[y].append(newNode)
   for rows in grid:
     for cell in rows:
       cell.find_connections(grid)
-  if startNode is not None and endNode is not None:
-    intermitten = dijkstra(grid, startNode, endNode)
-    path = find_path(endNode, intermitten)
-
-    print(len(path)-1)
-    #print_path(grid, path)
+  if startNode is not None and len(endNodes) > 0:
+    intermitten = dijkstra(grid, startNode)
+    min_path = 100_000
+    for endNode in endNodes:
+      path = find_path(endNode, intermitten)
+      if len(path) > 1:
+        print(len(path)-1)
+        if len(path)-1 < min_path:
+          min_path = len(path)-1
+          print_path(grid, path)
+    print(min_path)
+    
 
 def print_path(grid: list[list[node]], path: list[node]):
   lines = [["." for _ in range(len(grid[0]))] for _ in range(len(grid))]
@@ -97,7 +89,7 @@ def print_path(grid: list[list[node]], path: list[node]):
   for line in lines:
     print("".join(line))
 
-def dijkstra(graph: list[list[node]], startNode: node, targetNode: node):
+def dijkstra(graph: list[list[node]], startNode: node):
   distances: dict[node, int] = {}
   previous: dict[node, node] = {}
   Q: list[node] = []
@@ -105,8 +97,6 @@ def dijkstra(graph: list[list[node]], startNode: node, targetNode: node):
   while len(Q) > 0:
     u: node = find_smallest(Q, distances)
     Q.remove(u)
-    if u == targetNode:
-      break
     for v in u.connections:
       if v in Q:
         distance_update(u,v,distances,previous)
