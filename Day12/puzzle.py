@@ -11,41 +11,36 @@ class node:
     self.x = x
     self.y = y
     self.elevation = elevation
+  def add_neighbour(self, other: "node"):
+    if other.elevation - self.elevation <= 1:
+      self.connections.append(other)
   def find_connections(self, grid: list[list["node"]]):
     # upper edge
     if self.y > 0:
       # x00
       if self.x > 0:
-        if abs(grid[self.y-1][self.x-1].elevation - self.elevation) <=1:
-          self.connections.append(grid[self.y-1][self.x-1])
+        self.add_neighbour(grid[self.y-1][self.x-1])
       # 0x0
-      if abs(grid[self.y-1][self.x].elevation - self.elevation) <=1:
-        self.connections.append(grid[self.y-1][self.x])
+      self.add_neighbour(grid[self.y-1][self.x])
       # 00x
-      if self.x < len(grid[self.y-1])-1:        
-        if abs(grid[self.y-1][self.x+1].elevation - self.elevation) <=1:
-          self.connections.append(grid[self.y-1][self.x+1])
+      if self.x < len(grid[self.y-1])-1:
+        self.add_neighbour(grid[self.y-1][self.x+1])
     # x.0
     if self.x > 0:
-      if abs(grid[self.y][self.x-1].elevation - self.elevation) <=1:
-        self.connections.append(grid[self.y][self.x-1])
+      self.add_neighbour(grid[self.y][self.x-1])
     # 0.x
-    if self.x < len(grid[self.y])-1:        
-      if abs(grid[self.y][self.x+1].elevation - self.elevation) <=1:
-        self.connections.append(grid[self.y][self.x+1])
+    if self.x < len(grid[self.y])-1:
+      self.add_neighbour(grid[self.y][self.x+1])
     # lower edge
     if self.y < len(grid)-1:
       # x00
       if self.x > 0:
-        if abs(grid[self.y+1][self.x-1].elevation - self.elevation) <=1:
-          self.connections.append(grid[self.y+1][self.x-1])
+        self.add_neighbour(grid[self.y+1][self.x-1])
       # 0x0
-      if abs(grid[self.y+1][self.x].elevation - self.elevation) <=1:
-        self.connections.append(grid[self.y+1][self.x])
+      self.add_neighbour(grid[self.y+1][self.x])
       # 00x
       if self.x < len(grid[self.y+1])-1:
-        if abs(grid[self.y+1][self.x+1].elevation - self.elevation) <=1:
-          self.connections.append(grid[self.y+1][self.x+1])
+        self.add_neighbour(grid[self.y+1][self.x+1])
       
 def main():
   """Main Function called on Startup"""
@@ -69,12 +64,16 @@ def main():
   for rows in grid:
     for cell in rows:
       cell.find_connections(grid)
+  if startNode is not None and endNode is not None:
+    intermitten = dijkstra(grid, startNode, endNode)
+    path = find_path(endNode, intermitten)
+    print(len(path))
       
-def dijkstra(graph, startNode, targetNode):
-  distances: dict = {}
-  previous: dict = {}
+def dijkstra(graph: list[list[node]], startNode: node, targetNode: node):
+  distances: dict[node, int] = {}
+  previous: dict[node, node] = {}
   Q: list[node] = []
-  initialise(graph, startNode, distances, previous, Q)
+  initialise(graph, startNode, distances, Q)
   while len(Q) > 0:
     u: node = find_smallest(Q, distances)
     Q.remove(u)
@@ -85,21 +84,20 @@ def dijkstra(graph, startNode, targetNode):
         distance_update(u,v,distances,previous)
   return previous
 
-def initialise(graph, startNode, distances: dict, previous: dict, Q: list[node]):
+def initialise(graph: list[list[node]], startNode: node, distances: dict[node, int], Q: list[node]):
   for y in graph:
     for x in y:
       Q.append(x)
       distances[x] = 100_000
-      previous[x] = None
   distances[startNode] = 0
 
-def distance_update(u,v,distances, previous):
+def distance_update(u: node, v: node, distances: dict[node, int], previous: dict[node, node]):
   alternative = distances[u] + 1
   if alternative < distances[v]:
     distances[v] = alternative
     previous[v]= u
 
-def find_smallest(Q, distances):
+def find_smallest(Q: list[node], distances: dict[node, int]):
   smallestNode = Q[0]
   smallestWeight = distances[smallestNode]
   for n in Q:
@@ -107,6 +105,14 @@ def find_smallest(Q, distances):
       smallestWeight = distances[n]
       smallestNode = n
   return smallestNode  
+
+def find_path(target: node, previous: dict[node, node]):
+  path = [target]
+  u = target
+  while previous[u] is not None:
+    u = previous[u]
+    path.insert(0, u)
+  return path
 
 if __name__ == "__main__":
   st = time.time()
