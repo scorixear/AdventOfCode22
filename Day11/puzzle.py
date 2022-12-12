@@ -37,7 +37,7 @@ class monkey:
     for item in self.items:
       self.inspections += 1
       item = self.operation(item)
-      item = item // 3
+      #item = item // 3
       if item % self.test == 0:
         returnList.append([self.outcomeTrue, item])
       else:
