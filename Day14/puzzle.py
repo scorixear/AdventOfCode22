@@ -56,15 +56,18 @@ def main():
         for x in range(leftx, rightx+1):
           landscape[y][x] = Type.ROCK
   landscape[start[1]][start[0]] = Type.SOURCE
-  print_grid(landscape)
+  #print_grid(landscape)
   counter = 0
   while True:
     counter+=1
     try:
       spawn_point(landscape, start)
+    except NameError:
+      counter += 1
+      break
     except:
       break
-  print_grid(landscape)
+  #print_grid(landscape)
   print(counter-1)
 
 def print_grid(grid):
