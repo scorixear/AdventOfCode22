@@ -5,22 +5,22 @@ import time
 import re
 from functools import reduce
 
-INPUT_FILE="sample"
-SELECTED_Y = 10
+INPUT_FILE="input"
+SELECTED_Y = 2_000_000
 
 def get_overlap(sensor, beacon):
   max_reach = (abs(sensor[0]-beacon[0])+abs(sensor[1]-beacon[1]))
   x_reach = 0
   if SELECTED_Y > sensor[1]:
-    if SELECTED_Y - sensor[1] < max_reach:
+    if SELECTED_Y - sensor[1] > max_reach:
       return None
     else:
       x_reach = (max_reach - (SELECTED_Y - sensor[1]))
   else:
-    if sensor[1] - SELECTED_Y < max_reach:
+    if sensor[1] - SELECTED_Y > max_reach:
       return None
     else:
-      x_reach = (max_reach - (sensor[1] - max_reach))
+      x_reach = (max_reach - (sensor[1] - SELECTED_Y))
   return (sensor[0] - x_reach, sensor[0] + x_reach)
 def main():
   """Main Function called on Startup"""
@@ -44,11 +44,11 @@ def main():
   spans.sort(key=lambda s: s[0])
   min_x = spans[0][0]
   max_spans = sorted(spans, key=lambda s: s[1])
-  max_x = spans[-1][1]
+  max_x = max_spans[-1][1]
   row = [False for _ in range(min_x, max_x+1)]
   for span in spans:
     for i in range(span[0], span[1]+1):
-      row[span[0]-min_x] = True
+      row[i-min_x] = True
   for beacon in fitting_beacons:
     row[beacon - min_x] = False
   count = reduce(lambda total,element: total + 1 if element else total, row)
